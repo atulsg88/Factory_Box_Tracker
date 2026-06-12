@@ -1,26 +1,508 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-color: #fafaf9;
+  /* very soft warm white */
+  --surface-color: rgba(255, 255, 255, 0.7);
+  --surface-border: rgba(0, 0, 0, 0.05);
+  --text-primary: #292524;
+  /* warm dark slate */
+  --text-secondary: #78716c;
+  --text-tertiary: #a8a29e;
+  --accent-primary: #10b981;
+  /* positive soft emerald */
+  --font-main: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark theme variables — add the `dark` class to <body> to enable */
+.dark {
+  --bg-color: #0b0f14;
+  --surface-color: rgba(20,24,28,0.7);
+  --surface-border: rgba(255, 255, 255, 0.04);
+  --text-primary: #e6eef6;
+  --text-secondary: #9aa6b2;
+  --text-tertiary: #7f8a95;
+  --accent-primary: #22c55e;
+  --font-main: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.logo-container {
+  width: 44px;
+  height: 44px;
+  background: var(--surface-color);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.logo-icon {
+  color: var(--accent-primary);
+}
+
+.dashboard-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.header-actions {
+  margin-left: auto;
+  position: relative;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-color);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-family: var(--font-main);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+}
+
+.export-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface-color);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  min-width: 180px;
+}
+
+.export-option {
+  background: transparent;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  text-align: left;
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.export-option:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Cards */
+.glass-card {
+  background: var(--surface-color);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.02);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-title {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.kpi-icon {
+  color: var(--text-tertiary);
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.kpi-trend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.kpi-trend.trend-up {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.kpi-trend.text-red-400 {
+  color: #f43f5e;
+  font-weight: 500;
+}
+
+/* Layout Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.chart-container {
+  height: 400px;
+  width: 100%;
+}
+
+/* Live Feed */
+.recent-scans-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.recent-scans-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recent-scans-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.scan-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--surface-border);
+  transition: opacity 0.3s ease;
+}
+
+.scan-item:hover {
+  opacity: 0.7;
+}
+
+.scan-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scan-box-icon {
+  color: var(--text-tertiary);
+}
+
+.scan-type {
+  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.scan-time {
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  font-family: var(--font-display);
+}
+
+.scan-type-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.scan-type-link:hover {
+  color: var(--accent-primary);
+}
+
+/* Cats */
+.mb-10 {
+  margin-bottom: 3rem;
+}
+
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header-flex .section-title {
+  margin-bottom: 0;
+}
+
+.timeframe-tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.timeframe-tabs button {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-weight: 500;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.timeframe-tabs button.active {
+  background: var(--surface-color);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--surface-border);
+}
+
+.timeframe-tabs button:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+.category-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  background: var(--surface-color);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.category-icon {
+  color: var(--text-tertiary);
+}
+
+.category-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.category-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  border: 1px dashed var(--surface-border);
+  border-radius: 12px;
+}
+
+/* Custom Additions */
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--surface-color) !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Hide common provider/dev badges injected into preview sites (Netlify, Vercel, Sentry, Hotjar, LogRocket) */
+#netlify-badge, .netlify-badge, .netlify-identity, .netlify-identity-widget, .netlify-identity-button,
+.vercel-badge, #vercel-badge,
+.sentry-badge, .sentry-link, .sentry__badge,
+.hotjar-badge, .hj-badge,
+.logrocket-badge, .lr-badge,
+.nr-badge, .n-badge,
+[data-testid="netlify-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Generic: hide small fixed circular overlays often used by dev widgets — conservative rules */
+body > div[style*="position:fixed"][style*="bottom"] {
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Stronger rule: hide any small fixed circular overlays frequently used for dev widgets.
+   Targets direct children to avoid hiding legitimate site content. */
+body > div[style*="position:fixed"],
+body > div[style*="position: sticky"],
+body > div[style*="position: absolute"] {
+  position: relative !important;
+}
+
+body > div[style*="position:fixed"] *,
+body > div[style*="position: sticky"] *,
+body > div[style*="position: absolute"] * {
+  pointer-events: auto !important;
+}
+
+/* Specifically hide very small fixed elements (likely badges): */
+body > div[style*="position:fixed"]:not([data-preserve]),
+body > div[style*="position: sticky"]:not([data-preserve]) {
+  width: auto !important;
+  height: auto !important;
+}
+
+body > div[style*="position:fixed"][style*="width:"] ,
+body > div[style*="position:fixed"][style*="height:"] {
+  /* if inline style sets tiny width/height, hide it */
+  display: none !important;
+}
+
+/* Fallback: hide very small circular elements anywhere (radius, size) but avoid touching larger UI by size threshold */
+*[style*="border-radius:50%"], *[style*="border-radius: 50%"] {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* Conservative universal hide for tiny fixed badges (explicit) */
+body * {
+  /* nothing here; rules above are targeted. */
+}
+
+/* Hide Next.js devtools badge and related Next dev overlay elements */
+#devtools-indicator,
+#devtools-indicator *,
+[data-next-badge-root],
+[data-next-badge],
+[data-nextjs-dev-tools-button],
+[aria-controls="nextjs-dev-tools-menu"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
